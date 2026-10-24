@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5323695755411926"
+     crossorigin="anonymous"></script>
+<meta name="theme-color" content="#090d14">
+<title>NEON DRIVE — Yarış</title>
+<style>
+:root{color-scheme:dark;--bg:#090d14;--panel:#101925;--cyan:#54e7ff;--red:#ff465b;--text:#f4f7fb;--muted:#a5b1c2}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif}button{font:inherit;cursor:pointer;touch-action:manipulation}
+#app{position:relative;width:100%;height:100%;min-height:320px;background:radial-gradient(ellipse at 50% 0%,#172638 0,#090d14 60%)}
+canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.topbar{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:calc(14px + env(safe-area-inset-top)) 18px 12px;pointer-events:none}
+.brand{font-weight:950;letter-spacing:.16em;font-size:clamp(14px,2.4vw,22px);text-shadow:0 0 20px #54e7ff55}.brand span{color:var(--cyan)}
+.hud{display:none;gap:10px;align-items:stretch}.hud.show{display:flex}.stat{min-width:74px;padding:8px 11px;background:#09111ddd;border:1px solid #ffffff1c;border-radius:12px;backdrop-filter:blur(8px)}.stat small{display:block;font-size:10px;color:var(--muted);letter-spacing:.12em}.stat strong{font-size:clamp(15px,2.5vw,21px);font-variant-numeric:tabular-nums}
+.overlay{position:absolute;inset:0;display:grid;place-items:center;padding:20px;background:linear-gradient(180deg,#060a12a6,#060a12c9);overflow:auto}.overlay.hidden{display:none}
+.panel{width:min(510px,100%);padding:clamp(22px,5vw,42px);background:linear-gradient(145deg,#142131f5,#0b111bf5);border:1px solid #ffffff20;border-radius:24px;box-shadow:0 28px 90px #0009;text-align:center}
+.eyebrow{color:var(--cyan);font-size:11px;font-weight:800;letter-spacing:.28em;text-transform:uppercase}
+h1{margin:10px 0 8px;font-size:clamp(34px,8vw,62px);line-height:.98;letter-spacing:-.055em;font-weight:1000}h1 em{font-style:normal;color:var(--cyan);text-shadow:0 0 28px #54e7ff40}
+.subtitle{color:var(--muted);line-height:1.6;margin:14px auto 24px;max-width:350px;font-size:14px}
+.actions{display:grid;gap:10px}.btn{border:1px solid #ffffff22;color:var(--text);background:#ffffff0a;border-radius:12px;padding:14px 18px;font-weight:800;transition:transform .12s,background .12s,border-color .12s}.btn:hover{background:#ffffff15;border-color:#ffffff55}.btn:active{transform:scale(.985)}.btn.primary{background:linear-gradient(100deg,#27bfdc,#54e7ff);color:#061017;border:0;box-shadow:0 8px 30px #54e7ff28}.btn.secondary{background:#182738}
+.help{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:18px;color:#aeb9c7;font-size:11px}.key{border:1px solid #ffffff30;background:#ffffff0c;border-radius:5px;padding:3px 6px;color:white;font-weight:800}
+#pauseBtn{pointer-events:auto;display:none;border:1px solid #ffffff30;border-radius:10px;background:#09111ddd;color:white;padding:9px 12px}
+#toast{position:absolute;top:90px;left:50%;transform:translateX(-50%);background:#09111de8;border:1px solid #54e7ff66;padding:9px 14px;border-radius:999px;font-size:12px;color:var(--cyan);opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}#toast.show{opacity:1}
+.touch-controls{position:absolute;left:0;right:0;bottom:calc(18px + env(safe-area-inset-bottom));display:none;justify-content:space-between;padding:0 18px;pointer-events:none}.touch-controls.show{display:flex}.touch-group{display:flex;gap:10px}.touch-btn{pointer-events:auto;width:62px;height:62px;border-radius:18px;border:1px solid #ffffff45;background:#09111dbd;color:#fff;font-size:26px;font-weight:900;backdrop-filter:blur(8px);user-select:none;-webkit-user-select:none}.touch-btn:active,.touch-btn.active{background:#54e7ff55;border-color:var(--cyan)}.touch-btn.nitro{font-size:12px;letter-spacing:.05em;color:var(--cyan);width:72px}
+.footer{margin-top:18px;color:#728196;font-size:10px}
+@media(max-width:520px){.topbar{padding-left:12px;padding-right:12px}.stat{min-width:61px;padding:7px 8px}.stat small{font-size:9px}.panel{border-radius:20px}.subtitle{font-size:13px}.touch-btn{width:58px;height:58px}.hud{gap:5px}}
+@media(hover:none),(max-width:700px){.touch-controls.show{display:flex}}
+</style>
+</head>
+<body>
+<div id="app">
+ <canvas id="game" aria-label="NEON DRIVE yarış oyun alanı"></canvas>
+ <div class="topbar">
+  <div class="brand">NEON <span>DRIVE</span></div>
+  <div class="hud" id="hud">
+   <div class="stat"><small>SKOR</small><strong id="score">000000</strong></div>
+   <div class="stat"><small>HIZ</small><strong><span id="speed">0</span> <small style="display:inline">KM/H</small></strong></div>
+   <div class="stat"><small>SEVİYE</small><strong id="level">1</strong></div>
+   <button id="pauseBtn" aria-label="Oyunu duraklat">Ⅱ</button>
+  </div>
+ </div>
+ <div id="toast" role="status"></div>
+ <div class="overlay" id="menu">
+  <div class="panel">
+   <div class="eyebrow">ARCADE RACING • 01</div>
+   <h1>NEON<br><em>DRIVE</em></h1>
+   <p class="subtitle">Gece yollarında hızını göster. Trafikten sıyrıl, nitro kullan ve kendi rekorunu kır.</p>
+   <div class="actions">
+    <button class="btn primary" id="startBtn">YARIŞA BAŞLA&nbsp; →</button>
+    <button class="btn secondary" id="soundBtn">🔊 SES: AÇIK</button>
+   </div>
+   <div class="help"><span><b class="key">←</b> <b class="key">→</b> Şerit değiştir</span><span><b class="key">↑</b> Hızlan</span><span><b class="key">SPACE</b> Nitro</span><span><b class="key">P</b> Duraklat</span></div>
+   <div class="footer">Kayıtlı rekor: <b id="menuBest">0</b> • Klavye ve dokunmatik kontroller</div>
+  </div>
+ </div>
+ <div class="overlay hidden" id="endScreen">
+  <div class="panel">
+   <div class="eyebrow" id="endEyebrow">YARIŞ TAMAMLANDI</div>
+   <h1 id="endTitle">OYUN<br><em>BİTTİ</em></h1>
+   <p class="subtitle" id="endText">Yolun sonu değil. Bir tur daha dene!</p>
+   <div class="actions">
+    <button class="btn primary" id="againBtn">TEKRAR YARIŞ&nbsp; ↻</button>
+    <button class="btn secondary" id="homeBtn">ANA MENÜ</button>
+   </div>
+   <div class="footer">Skor: <b id="finalScore">0</b> • Rekor: <b id="finalBest">0</b></div>
+  </div>
+ </div>
+ <div class="overlay hidden" id="pauseScreen">
+  <div class="panel">
+   <div class="eyebrow">PİT ALANI</div><h1>DURAKLATILDI</h1>
+   <p class="subtitle">Hazır olduğunda yarışa devam et.</p>
+   <div class="actions"><button class="btn primary" id="resumeBtn">DEVAM ET&nbsp; ▶</button><button class="btn secondary" id="pauseHomeBtn">ANA MENÜ</button></div>
+  </div>
+ </div>
+ <div class="touch-controls" id="touchControls">
+  <div class="touch-group"><button class="touch-btn" data-action="left" aria-label="Sola git">‹</button><button class="touch-btn" data-action="right" aria-label="Sağa git">›</button></div>
+  <div class="touch-group"><button class="touch-btn nitro" data-action="nitro" aria-label="Nitro kullan">NITRO</button><button class="touch-btn" data-action="up" aria-label="Hızlan">↑</button>
+  </div>
+ </div>
+</div>
+<script>
+(() => {
+'use strict';
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d',{alpha:false});
+const $=id=>document.getElementById(id);
+const ui={menu:$('menu'),end:$('endScreen'),pause:$('pauseScreen'),hud:$('hud'),touch:$('touchControls'),score:$('score'),speed:$('speed'),level:$('level'),menuBest:$('menuBest'),finalScore:$('finalScore'),finalBest:$('finalBest'),toast:$('toast'),pauseBtn:$('pauseBtn')};
+const keys={left:false,right:false,up:false,nitro:false};
+let state='menu',soundOn=true,audio=null,lastTime=0,elapsed=0,score=0,best=0,speed=0,level=1,nitro=100,playerX=0,playerLane=1,roadOffset=0,spawnTimer=0,traffic=[],particles=[],shake=0,toastTimer=0;
+const LANES=3;
+try{best=Math.max(0,Number(localStorage.getItem('neonDriveBest')||0)||0)}catch(_){best=0}
+ui.menuBest.textContent=best.toLocaleString('tr-TR');
+function resize(){const dpr=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.max(1,Math.floor(innerWidth*dpr));canvas.height=Math.max(1,Math.floor(innerHeight*dpr));ctx.setTransform(dpr,0,0,dpr,0,0)}
+addEventListener('resize',resize,{passive:true});resize();
+function audioContext(){if(!soundOn)return null;try{if(!audio)audio=new(window.AudioContext||window.webkitAudioContext)();if(audio.state==='suspended')audio.resume();return audio}catch(_){return null}}
+function beep(freq=440,duration=.08,type='sine',volume=.035){const a=audioContext();if(!a)return;try{const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(volume,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+duration);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+duration)}catch(_){}}
+function toast(text){ui.toast.textContent=text;ui.toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>ui.toast.classList.remove('show'),1500)}
+function setOverlay(which){ui.menu.classList.toggle('hidden',which!=='menu');ui.end.classList.toggle('hidden',which!=='end');ui.pause.classList.toggle('hidden',which!=='pause')}
+function updateHud(){ui.score.textContent=Math.floor(score).toString().padStart(6,'0');ui.speed.textContent=Math.round(speed);ui.level.textContent=level;ui.menuBest.textContent=best.toLocaleString('tr-TR')}
+function startGame(){audioContext();state='playing';elapsed=0;score=0;speed=110;level=1;nitro=100;playerX=0;playerLane=1;roadOffset=0;spawnTimer=.5;traffic=[];particles=[];shake=0;Object.keys(keys).forEach(k=>keys[k]=false);setOverlay('none');ui.hud.classList.add('show');ui.pauseBtn.style.display='block';ui.touch.classList.add('show');updateHud();lastTime=performance.now();beep(520,.1,'triangle')}
+function finishGame(){if(state!=='playing')return;state='end';speed=0;ui.hud.classList.remove('show');ui.pauseBtn.style.display='none';ui.touch.classList.remove('show');const final=Math.floor(score);if(final>best){best=final;try{localStorage.setItem('neonDriveBest',String(best))}catch(_){}$('endEyebrow').textContent='YENİ REKOR!';$('endTitle').innerHTML='YENİ<br><em>REKOR</em>';beep(880,.22,'triangle')}else{$('endEyebrow').textContent='YARIŞ TAMAMLANDI';$('endTitle').innerHTML='OYUN<br><em>BİTTİ</em>'} $('endText').textContent='Bir sonraki turda daha uzağa git ve rekorunu geliştir.';ui.finalScore.textContent=final.toLocaleString('tr-TR');ui.finalBest.textContent=best.toLocaleString('tr-TR');setOverlay('end');updateHud()}
+function pauseGame(){if(state==='playing'){state='paused';setOverlay('pause');ui.touch.classList.remove('show');Object.keys(keys).forEach(k=>keys[k]=false)}}
+function resumeGame(){if(state!=='paused')return;state='playing';setOverlay('none');ui.touch.classList.add('show');lastTime=performance.now()}
+function home(){state='menu';speed=0;traffic=[];particles=[];ui.hud.classList.remove('show');ui.pauseBtn.style.display='none';ui.touch.classList.remove('show');setOverlay('menu');ui.menuBest.textContent=best.toLocaleString('tr-TR');Object.keys(keys).forEach(k=>keys[k]=false)}
+function moveLane(dir){if(state!=='playing')return;playerLane=Math.max(0,Math.min(LANES-1,playerLane+dir));playerX=laneX(playerLane);beep(250+playerLane*55,.045,'square',.015)}
+function laneX(lane){return lane-1}
+function roadGeom(){const w=innerWidth,h=innerHeight;return {w,h,topY:h*.12,bottomY:h*1.05,topW:Math.min(w*.32,230),bottomW:Math.min(w*.94,760),cx:w*.5}}
+function roadAt(y,g){const t=Math.max(0,Math.min(1,(y-g.topY)/(g.bottomY-g.topY)));const width=g.topW+(g.bottomW-g.topW)*t;return {t,width,left:g.cx-width/2,right:g.cx+width/2,center:g.cx}}
+function laneCenter(lane,y,g){const r=roadAt(y,g);return r.left+r.width*(lane+.5)/LANES}
+function drawBackground(g){const sky=ctx.createLinearGradient(0,0,0,g.h);sky.addColorStop(0,'#0a1320');sky.addColorStop(.45,'#172638');sky.addColorStop(1,'#101820');ctx.fillStyle=sky;ctx.fillRect(0,0,g.w,g.h);
+ // Distant city skyline
+ const base=g.h*.47;for(let i=0;i<36;i++){const x=i*g.w/35,hash=(i*7919)%17;const bw=g.w/42+hash%9;const bh=g.h*(.05+(hash%7)*.018);ctx.fillStyle=i%3===0?'#1b2d40':'#111f2e';ctx.fillRect(x,base-bh,bw,bh);for(let wy=base-bh+8;wy<base-4;wy+=10){for(let wx=x+5;wx<x+bw-3;wx+=8){ctx.fillStyle=((Math.floor(wx+wy)+i)%4===0)?'#54e7ff55':'#ffc96b38';ctx.fillRect(wx,wy,3,4)}}}
+ const grd=ctx.createLinearGradient(0,base,0,g.h);grd.addColorStop(0,'#1a2731');grd.addColorStop(1,'#05090f');ctx.fillStyle=grd;ctx.fillRect(0,base,g.h,g.h-base)}
+function drawRoad(g,dt){const horizon=g.topY;ctx.fillStyle='#252f39';ctx.beginPath();ctx.moveTo(g.cx-g.topW*.58,horizon);ctx.lineTo(g.cx+g.topW*.58,horizon);ctx.lineTo(g.cx+g.bottomW*.58,g.h*1.1);ctx.lineTo(g.cx-g.bottomW*.58,g.h*1.1);ctx.closePath();ctx.fill();
+const rTop=roadAt(horizon,g),rBot=roadAt(g.h*1.1,g);ctx.fillStyle='#303943';ctx.beginPath();ctx.moveTo(rTop.left,horizon);ctx.lineTo(rTop.right,horizon);ctx.lineTo(rBot.right,g.h*1.1);ctx.lineTo(rBot.left,g.h*1.1);ctx.closePath();ctx.fill();
+// asphalt texture
+for(let i=0;i<95;i++){const y=((i*37+roadOffset*1.8)%(g.h*.95))+horizon;const r=roadAt(y,g);const x=r.left+((i*97)%100)/100*r.width;ctx.fillStyle=i%3===0?'#aab6c018':'#00000018';ctx.fillRect(x,y,Math.max(1,r.t*2),Math.max(1,r.t*2))}
+ // Road edge stripes
+for(const side of [-1,1]){ctx.strokeStyle='#d7e0e8';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(g.cx+side*g.topW/2,horizon);ctx.lineTo(g.cx+side*g.bottomW/2,g.h*1.1);ctx.stroke();ctx.strokeStyle='#ff465b';ctx.lineWidth=4;for(let y=horizon+((roadOffset*2)%70);y<g.h*1.1;y+=70){const r=roadAt(y,g),r2=roadAt(Math.min(y+34,g.h*1.1),g);ctx.beginPath();ctx.moveTo(side<0?r.left-4:r.right+4,y);ctx.lineTo(side<0?r2.left-4:r2.right+4,Math.min(y+34,g.h*1.1));ctx.stroke()}}
+ // Lane markers perspective dashes
+for(let lane=1;lane<LANES;lane++){for(let y=horizon+((roadOffset*1.65)%92);y<g.h*1.1;y+=92){const y2=Math.min(y+43*(Math.max(.15,(y-horizon)/(g.h-horizon))),g.h*1.1);const a=roadAt(y,g),b=roadAt(y2,g),x1=a.left+a.width*lane/LANES,x2=b.left+b.width*lane/LANES;ctx.strokeStyle='#e4edf055';ctx.lineWidth=Math.max(1,roadAt(y,g).t*3);ctx.beginPath();ctx.moveTo(x1,y);ctx.lineTo(x2,y2);ctx.stroke()}}
+}
+function drawCar(x,y,w,h,color,player=false){ctx.save();ctx.translate(x,y);
+ // shadow
+ ctx.fillStyle='#0009';ctx.beginPath();ctx.ellipse(0,h*.43,w*.65,h*.17,0,0,Math.PI*2);ctx.fill();
+ // wheels
+ ctx.fillStyle='#080b10';const ww=w*.16,wh=h*.23;for(const side of [-1,1])for(const yy of [-h*.25,h*.23]){ctx.fillRect(side*(w*.42)-ww/2,yy-wh/2,ww,wh)}
+ // body
+ const body=ctx.createLinearGradient(-w/2,0,w/2,0);body.addColorStop(0,'#10151b');body.addColorStop(.24,color);body.addColorStop(.7,color);body.addColorStop(1,'#10151b');ctx.fillStyle=body;ctx.beginPath();ctx.moveTo(-w*.34,h*.42);ctx.lineTo(-w*.46,h*.12);ctx.lineTo(-w*.39,-h*.25);ctx.quadraticCurveTo(-w*.33,-h*.49,-w*.17,-h*.49);ctx.lineTo(w*.17,-h*.49);ctx.quadraticCurveTo(w*.33,-h*.49,w*.39,-h*.25);ctx.lineTo(w*.46,h*.12);ctx.lineTo(w*.34,h*.42);ctx.quadraticCurveTo(0,h*.51,-w*.34,h*.42);ctx.fill();
+ // windows
+ ctx.fillStyle='#101d2a';ctx.beginPath();ctx.moveTo(-w*.27,-h*.22);ctx.lineTo(-w*.17,-h*.41);ctx.quadraticCurveTo(0,-h*.45,w*.17,-h*.41);ctx.lineTo(w*.27,-h*.22);ctx.closePath();ctx.fill();
+ ctx.fillStyle='#8fd8e8';ctx.globalAlpha=.35;ctx.fillRect(-w*.22,-h*.18,w*.44,h*.035);ctx.globalAlpha=1;
+ if(player){ctx.fillStyle='#e9fbff';ctx.shadowColor='#54e7ff';ctx.shadowBlur=12;ctx.fillRect(-w*.34,h*.29,w*.16,h*.055);ctx.fillRect(w*.18,h*.29,w*.16,h*.055);ctx.shadowBlur=0;ctx.fillStyle='#54e7ff';ctx.fillRect(-w*.035,-h*.39,w*.07,h*.72)}
+ else{ctx.fillStyle='#ff314a';ctx.shadowColor='#ff314a';ctx.shadowBlur=8;ctx.fillRect(-w*.34,h*.29,w*.16,h*.06);ctx.fillRect(w*.18,h*.29,w*.16,h*.06);ctx.shadowBlur=0}
+ ctx.restore()}
+function spawnTraffic(g){const lane=Math.floor(Math.random()*LANES);if(traffic.some(c=>c.lane===lane&&c.y<g.h*.35))return;const colors=['#e6b84c','#9d7cff','#e84b5a','#4f9dff','#d9e0e8'];traffic.push({lane,y:g.topY+10,color:colors[Math.floor(Math.random()*colors.length)],passed:false,scale:.45+Math.random()*.08})}
+function drawTraffic(g){for(const car of traffic){const r=roadAt(car.y,g),w=22+r.t*26,h=38+r.t*48;drawCar(laneCenter(car.lane,car.y,g),car.y,w,h,car.color,false)}}
+function drawPlayer(g){const y=g.h*.79,r=roadAt(y,g),w=Math.min(52, r.width*.19),h=w*1.68;const x=laneCenter(playerLane,y,g)+(playerX-(playerLane-1))*r.width*.25;drawCar(x,y,w,h,'#20cde8',true);if(keys.nitro&&nitro>0){ctx.save();ctx.globalAlpha=.75;for(let i=0;i<3;i++){ctx.fillStyle=i%2?'#54e7ff':'#ffb44b';ctx.beginPath();ctx.moveTo(x-w*.19,y+h*.43);ctx.lineTo(x-w*.05,y+h*.43);ctx.lineTo(x-w*.12,y+h*.43+Math.random()*24+10);ctx.fill()}ctx.restore()}}
+function update(dt){if(state!=='playing')return;elapsed+=dt;level=1+Math.floor(score/1200);const base=110+Math.min(100,level*5);speed=Math.min(260,base+(keys.up?35:0)+(keys.nitro&&nitro>0?65:0));if(keys.nitro&&nitro>0)nitro=Math.max(0,nitro-35*dt);else nitro=Math.min(100,nitro+8*dt);score+=speed*dt*.34;roadOffset+=speed*dt*.85;spawnTimer-=dt;const g=roadGeom();if(spawnTimer<=0){spawnTraffic(g);spawnTimer=Math.max(.42,1.12-level*.055)+Math.random()*.38}
+const travel=(g.h*.72)*dt*(.55+speed/160);for(const c of traffic){c.y+=travel*(.6+level*.035);if(!c.passed&&c.y>g.h*.8){c.passed=true;score+=100;beep(690,.045,'sine',.018)}}
+traffic=traffic.filter(c=>c.y<g.h+100);
+const py=g.h*.79,pr=roadAt(py,g),px=laneCenter(playerLane,py,g),pw=Math.min(52,pr.width*.19),ph=pw*1.68;
+for(const c of traffic){if(c.y>py-ph*.6&&c.y<py+ph*.6&&c.lane===playerLane){shake=.25;beep(95,.3,'sawtooth',.06);finishGame();return}}
+if(shake>0)shake=Math.max(0,shake-dt);updateHud()}
+function render(dt){const g=roadGeom();ctx.save();if(shake>0)ctx.translate((Math.random()-.5)*shake*18,(Math.random()-.5)*shake*18);drawBackground(g);drawRoad(g,dt);if(state==='playing'||state==='paused'||state==='end'){drawTraffic(g);drawPlayer(g)}else{ // moving preview traffic for menu
+ const t=performance.now()/1000;for(let i=0;i<3;i++){const y=g.topY+((t*130+i*g.h*.32)%(g.h*.83));drawCar(laneCenter((i+Math.floor(t/5))%3,y,g),y,24+roadAt(y,g).t*20,40+roadAt(y,g).t*35,['#b94b5c','#d6b75d','#4e91ca'][i],false)}}
+ // vignette
+ const v=ctx.createRadialGradient(g.cx,g.h*.55,g.h*.1,g.cx,g.h*.55,g.h*.8);v.addColorStop(0,'#00000000');v.addColorStop(1,'#02050bb0');ctx.fillStyle=v;ctx.fillRect(0,0,g.w,g.h);ctx.restore()}
+function frame(now){const dt=Math.min(.04,Math.max(0,(now-lastTime)/1000||0));lastTime=now;update(dt);render(dt);requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+$('startBtn').addEventListener('click',startGame);$('againBtn').addEventListener('click',startGame);$('homeBtn').addEventListener('click',home);$('pauseHomeBtn').addEventListener('click',home);$('resumeBtn').addEventListener('click',resumeGame);ui.pauseBtn.addEventListener('click',pauseGame);
+$('soundBtn').addEventListener('click',()=>{soundOn=!soundOn;$('soundBtn').textContent=(soundOn?'🔊 SES: AÇIK':'🔇 SES: KAPALI');if(soundOn)beep(500,.08)});
+addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(['arrowleft','arrowright','arrowup',' ','a','d','w'].includes(k))e.preventDefault();if(k==='arrowleft'||k==='a'){if(!keys.left)moveLane(-1);keys.left=true}if(k==='arrowright'||k==='d'){if(!keys.right)moveLane(1);keys.right=true}if(k==='arrowup'||k==='w')keys.up=true;if(k===' ')keys.nitro=true;if(k==='p'||k==='escape'){if(state==='playing')pauseGame();else if(state==='paused')resumeGame()}if(k==='enter'&&(state==='menu'||state==='end'))startGame()});
+addEventListener('keyup',e=>{const k=e.key.toLowerCase();if(k==='arrowleft'||k==='a')keys.left=false;if(k==='arrowright'||k==='d')keys.right=false;if(k==='arrowup'||k==='w')keys.up=false;if(k===' ')keys.nitro=false});
+document.querySelectorAll('[data-action]').forEach(btn=>{const act=btn.dataset.action;const down=e=>{e.preventDefault();btn.classList.add('active');if(act==='left')moveLane(-1);if(act==='right')moveLane(1);if(act==='up')keys.up=true;if(act==='nitro')keys.nitro=true};const up=e=>{e.preventDefault();btn.classList.remove('active');if(act==='up')keys.up=false;if(act==='nitro')keys.nitro=false};btn.addEventListener('pointerdown',down);btn.addEventListener('pointerup',up);btn.addEventListener('pointercancel',up);btn.addEventListener('lostpointercapture',up)});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&state==='playing')pauseGame()});
+})();
+</script>
+</body>
+</html>
